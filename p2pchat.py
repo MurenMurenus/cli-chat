@@ -63,7 +63,7 @@ def send_message(msg: str) -> None:
 
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                sock.sendto(msg.encode(), ('0.0.0.0', LISTENING_PORT))
+                sock.sendto(msg.encode(), ('255.255.255.255', LISTENING_PORT))
         except Exception as e:
             print(f'Error while broadcasting: {e}')
             return
