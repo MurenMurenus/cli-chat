@@ -15,10 +15,11 @@ def handle_messages() -> None:
 
     while True:
         try:
-            msg = socket_instance.recv(1024)
+            msg, addr = socket_instance.recvfrom(1024)
 
+            msg_to_print = f'{addr[0]}: {msg.decode()}'
             if msg:
-                print(msg.decode())
+                print(msg_to_print)
             else:
                 socket_instance.close()
                 break
@@ -41,10 +42,10 @@ def send_message(msg: str) -> None:
             msg_wo_destination = msg.replace(match.group(0), '')
             try:
                 my_addr = socket.gethostbyname(socket.gethostname())
-                msg_to_send = f'{my_addr}: {msg_wo_destination}'
+                # msg_to_send = f'{my_addr}: {msg_wo_destination}'
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                    sock.sendto(msg_to_send.encode(), (addr, LISTENING_PORT))
+                    sock.sendto(msg_wo_destination.encode(), (addr, LISTENING_PORT))
             except Exception as e:
                 print(f'Error sending direct message: {e}')
                 return
@@ -54,15 +55,15 @@ def send_message(msg: str) -> None:
         try:
             # print(f'HOSTNAME: {socket.gethostname()}')
             my_addr = socket.gethostbyname(socket.gethostname())
-            msg_to_send = f'{my_addr}: {msg}'
-            my_addr_broadcast = my_addr.split('.')
-            my_addr_broadcast[2] = '255'
-            my_addr_broadcast[3] = '255'
-            my_addr_broadcast = '.'.join(my_addr_broadcast)
+            # msg_to_send = f'{my_addr}: {msg}'
+            # my_addr_broadcast = my_addr.split('.')
+            # my_addr_broadcast[2] = '255'
+            # my_addr_broadcast[3] = '255'
+            # my_addr_broadcast = '.'.join(my_addr_broadcast)
 
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                sock.sendto(msg_to_send.encode(), (my_addr_broadcast, LISTENING_PORT))
+                sock.sendto(msg.encode(), ('0.0.0.0', LISTENING_PORT))
         except Exception as e:
             print(f'Error while broadcasting: {e}')
             return
